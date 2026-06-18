@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+/* ===========================================================================
+   Drift — glassmorphism control room over an animated red/magenta shader.
+   Tailwind v4 inline theme tokens.
+   =========================================================================== */
+
+@theme {
+  --color-bg: #08050b;
+  --color-panel: rgba(22, 14, 28, 0.62);
+  --color-panel-2: rgba(34, 22, 42, 0.55);
+  --color-border: rgba(255, 255, 255, 0.09);
+  --color-border-strong: rgba(255, 255, 255, 0.16);
+  --color-fg: #f3eef8;
+  --color-muted: #b9aecb;
+  --color-faint: #8a7d9e;
+
+  --color-brand: #b15cff;
+  --color-brand-2: #ff4d8d;
+  --color-brand-dim: rgba(177, 92, 255, 0.18);
+
+  --color-pass: #34d399;
+  --color-fail: #ff5d6c;
+  --color-warn: #fbbf24;
+  --color-low: #fde047;
+
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", "Fira Code", Menlo,
+    Consolas, monospace;
+
+  --radius: 0.875rem;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-fg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- glassmorphism ------------------------------------------------------- */
+.glass {
+  background: linear-gradient(
+    180deg,
+    rgba(40, 24, 50, 0.55),
+    rgba(16, 10, 22, 0.68)
+  );
+  backdrop-filter: blur(18px) saturate(135%);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow:
+    0 10px 44px -14px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+.glass-2 {
+  background: linear-gradient(
+    180deg,
+    rgba(48, 30, 60, 0.5),
+    rgba(24, 15, 32, 0.5)
+  );
+  backdrop-filter: blur(12px) saturate(130%);
+  -webkit-backdrop-filter: blur(12px) saturate(130%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.brand-text {
+  background: linear-gradient(90deg, #c77dff, #ff5d9e);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.glow-brand {
+  box-shadow: 0 0 24px -4px rgba(177, 92, 255, 0.55);
+}
+.glow-fail {
+  box-shadow: 0 0 24px -6px rgba(255, 93, 108, 0.55);
+}
+
+/* status dot */
+.dot {
+  height: 0.5rem;
+  width: 0.5rem;
+  border-radius: 9999px;
+  flex: none;
+}
+
+/* scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(177, 92, 255, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 9px rgba(177, 92, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(177, 92, 255, 0);
+  }
+}
+.animate-pulse-ring {
+  animation: pulse-ring 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+.animate-dash {
+  stroke-dasharray: 4 4;
+  animation: dash 0.7s linear infinite;
+}
+
+@keyframes dot-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.75);
+  }
+}
+.animate-dot {
+  animation: dot-pulse 1.2s ease-in-out infinite;
+}
