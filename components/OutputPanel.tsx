@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Loader2, Wand2, CheckCircle2, PackageCheck } from "lucide-react";
+import { Loader2, Wand2, CheckCircle2, PackageCheck, Network } from "lucide-react";
 import { Card, CardHeader, CardTitle, Mono } from "./ui";
 import { useRunStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -57,9 +57,17 @@ export function OutputPanel() {
   if (status === "idle") return null;
 
   return (
-    <Card>
+    <Card id="final-result" className="scroll-mt-20">
       <CardHeader>
-        <CardTitle>Delivery</CardTitle>
+        <div className="flex items-center gap-2">
+          <span className="grid h-6 w-6 place-items-center rounded-md bg-gradient-to-br from-brand/30 to-brand-2/25 text-brand">
+            <Network className="h-3.5 w-3.5" />
+          </span>
+          <div>
+            <CardTitle>Final result</CardTitle>
+            <p className="text-[10px] text-faint">exported by the coordinator</p>
+          </div>
+        </div>
         {status === "done" && (
           <span className="flex items-center gap-1 text-[11px] text-pass">
             <PackageCheck className="h-3.5 w-3.5" /> delivered

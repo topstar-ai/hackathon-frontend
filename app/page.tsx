@@ -7,11 +7,8 @@ import { PipelineGraph } from "@/components/PipelineGraph";
 import { VerdictInspector } from "@/components/VerdictInspector";
 import { EventLog } from "@/components/EventLog";
 import { AlignmentLoopModal } from "@/components/AlignmentLoopModal";
-import { VerdictSummary } from "@/components/VerdictSummary";
+import { CoordinatorBar } from "@/components/CoordinatorBar";
 import { useRunStore } from "@/lib/store";
-import { verdictTone } from "@/lib/verdict";
-import { isVisibleAgent } from "@/lib/agents";
-import type { AgentId } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 function StatusPill() {
@@ -43,25 +40,6 @@ function RunError() {
   );
 }
 
-function VerdictTally() {
-  const nodes = useRunStore((s) => s.nodes);
-  let pass = 0;
-  let fail = 0;
-  (Object.entries(nodes) as [AgentId, (typeof nodes)[AgentId]][]).forEach(([id, n]) => {
-    if (!isVisibleAgent(id)) return;
-    if (n.state !== "done" || !n.verdict) return;
-    const t = verdictTone(n.verdict);
-    if (t === "pass") pass++;
-    if (t === "fail") fail++;
-  });
-  return (
-    <div className="flex items-center gap-3 font-mono text-[11px]">
-      <span className="text-pass">{pass} pass</span>
-      <span className="text-fail">{fail} flag</span>
-    </div>
-  );
-}
-
 export default function RunPage() {
   return (
     <div className="mx-auto max-w-[1600px] p-4">
@@ -73,33 +51,37 @@ export default function RunPage() {
           <span className="text-fg">alignment pipeline</span>
         </h1>
         <p className="text-sm text-muted">
-          Specialist agents intercept every turn and hold the engine&apos;s output until it
-          passes alignment, gap, and the parallel quality checks.
+          The coordinator routes every turn through the agent workflow and only exports the
+          result once it passes alignment, gap, and the parallel quality checks.
         </p>
+      </div>
+
+      {/* Coordinator = the controller over the whole run */}
+      <div className="mb-4">
+        <CoordinatorBar />
       </div>
 
       <RunError />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[340px_minmax(0,1fr)_380px]">
-        {/* Left: input + output */}
+        {/* Left: input + final result */}
         <div className="flex flex-col gap-4">
           <InputPanel />
           <OutputPanel />
         </div>
 
-        {/* Center: pipeline */}
+        {/* Center: the agent workflow */}
         <Card className="flex flex-col">
           <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
             <div className="flex items-center gap-3">
-              <h2 className="text-sm font-semibold text-fg">Alignment pipeline</h2>
+              <div>
+                <h2 className="text-sm font-semibold text-fg">Agent workflow</h2>
+                <p className="text-[11px] text-faint">8 agents · generation steps</p>
+              </div>
               <StatusPill />
             </div>
-            <VerdictTally />
           </div>
-          <div className="max-h-[calc(100vh-13rem)] overflow-y-auto p-4">
-            <div className="mx-auto mb-4 w-full max-w-md">
-              <VerdictSummary />
-            </div>
+          <div className="max-h-[calc(100vh-15rem)] overflow-y-auto p-4">
             <PipelineGraph />
           </div>
         </Card>
@@ -111,7 +93,7 @@ export default function RunPage() {
       </div>
 
       {/* Bottom: event log */}
-      <Card className="mt-4 h-56 overflow-hidden">
+      <Card className="mt-4 h-52 overflow-hidden">
         <EventLog />
       </Card>
     </div>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Nav } from "@/components/Nav";
-import { ShaderBackground } from "@/components/ShaderBackground";
+import { Backdrop } from "@/components/Backdrop";
 
 export const metadata: Metadata = {
   title: "Drift — Alignment Control Room",
@@ -17,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen text-fg antialiased">
-        <ShaderBackground />
+        <Backdrop />
         <Nav />
         <main className="min-h-[calc(100vh-3.5rem)]">{children}</main>
       </body>
