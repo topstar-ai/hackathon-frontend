@@ -7,6 +7,8 @@ import type {
 } from "./types";
 import { AGENTS } from "./agents";
 import { MOCK_HARNESS, simulateAnswer, simulateRun } from "./mock";
+import { liveAnswer, liveRunPipeline } from "./liveRun";
+import { USE_MOCK as USE_MOCK_FLAG } from "./config";
 
 // ============================================================================
 // Data layer. Flip USE_MOCK to false and implement the `live*` functions to
@@ -21,7 +23,8 @@ import { MOCK_HARNESS, simulateAnswer, simulateRun } from "./mock";
 //     need to yield AgentEvents in arrival order.
 // ============================================================================
 
-export const USE_MOCK = true;
+// Re-exported so components/store read the single source of truth (lib/config).
+export const USE_MOCK = USE_MOCK_FLAG;
 
 // ----------------------------------------------------------------------------
 // runPipeline — submit a turn, stream agent events in pipeline order.
@@ -49,9 +52,9 @@ export function answerAlignmentQuestion(
 export async function getHarness(
   filter?: HarnessFilter,
 ): Promise<HarnessEntry[]> {
-  if (!USE_MOCK) return liveGetHarness(filter);
-
-  // simulate network latency
+  // The gateway exposes per-agent verdict endpoints but no harness *read* API,
+  // so history is served from the seeded harness. To wire a real read, point
+  // this at e.g. GET ${AGENT_API_BASE}/api/harness and map rows to HarnessEntry.
   await new Promise((r) => setTimeout(r, 250));
   let rows = [...MOCK_HARNESS];
 
@@ -103,30 +106,6 @@ export async function getHarness(
 // getAgents — static agent directory metadata.
 // ----------------------------------------------------------------------------
 export async function getAgents(): Promise<AgentMeta[]> {
-  if (!USE_MOCK) return liveGetAgents();
+  // Agent directory is static config (mirrors the real agents + endpoints).
   return AGENTS;
-}
-
-// ============================================================================
-// Live backend stubs — implement these against Band when USE_MOCK = false.
-// They intentionally throw so a half-wired backend fails loudly, not silently.
-// ============================================================================
-
-async function* liveRunPipeline(_input: RunInput): AsyncIterable<AgentEvent> {
-  // Example wiring:
-  //   const res = await fetch("/api/run", { method: "POST", body: JSON.stringify(_input) });
-  //   const reader = res.body!.getReader(); ... parse SSE/ndjson into AgentEvent ...
-  throw new Error("liveRunPipeline not implemented — set USE_MOCK=true or wire the Band backend.");
-}
-
-async function* liveAnswer(_runId: string, _answer: string): AsyncIterable<AgentEvent> {
-  throw new Error("liveAnswer not implemented — set USE_MOCK=true or wire the Band backend.");
-}
-
-async function liveGetHarness(_filter?: HarnessFilter): Promise<HarnessEntry[]> {
-  throw new Error("liveGetHarness not implemented — set USE_MOCK=true or wire the Band backend.");
-}
-
-async function liveGetAgents(): Promise<AgentMeta[]> {
-  throw new Error("liveGetAgents not implemented — set USE_MOCK=true or wire the Band backend.");
 }

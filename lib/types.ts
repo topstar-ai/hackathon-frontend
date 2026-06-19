@@ -124,6 +124,16 @@ export interface AgentMeta {
   rulesFile?: string;
   // layout hints for the pipeline graph
   parallelGroup?: string; // nodes sharing a group render side by side
+
+  // --- real backend identity (Drift / Band) -------------------------------
+  // How this agent is reached: an HTTP gateway endpoint, or coordinator-side
+  // orchestration with no public endpoint of its own.
+  exposure: "http" | "orchestration";
+  // POST path on the agent gateway, e.g. "05-alignment-classifier".
+  endpoint?: string;
+  // Band runtime + model powering the agent.
+  runtime?: string; // e.g. "Band · LangGraph"
+  model?: string; // e.g. "claude-sonnet-4-6"
 }
 
 // A streamed event from the pipeline.

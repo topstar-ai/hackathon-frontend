@@ -141,7 +141,28 @@ export function VerdictInspector() {
           )}
         </div>
         <p className="mt-1.5 text-xs text-muted">{meta.job}</p>
-        <div className="mt-1 font-mono text-[10px] text-faint">
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {meta.exposure === "http" ? (
+            <span className="rounded border border-brand/40 bg-brand/10 px-1.5 py-0.5 font-mono text-[10px] text-brand">
+              POST /api/agent/{meta.endpoint}
+            </span>
+          ) : (
+            <span className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] text-muted">
+              coordinator-orchestrated
+            </span>
+          )}
+          {meta.model && (
+            <span className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 font-mono text-[10px] text-muted">
+              {meta.model}
+            </span>
+          )}
+          {meta.runtime && (
+            <span className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] text-muted">
+              {meta.runtime}
+            </span>
+          )}
+        </div>
+        <div className="mt-1.5 font-mono text-[10px] text-faint">
           iteration {node.iteration} · shape: {meta.verdictShape}
         </div>
       </div>

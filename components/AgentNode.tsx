@@ -79,8 +79,15 @@ export function AgentNode({
           <div className="flex items-center gap-1.5">
             <span className="font-mono text-[10px] text-faint">{meta.number}</span>
             <span className="truncate text-sm font-semibold text-fg">{meta.name}</span>
+            {meta.exposure === "http" && (
+              <span className="rounded border border-brand/40 bg-brand/10 px-1 text-[8px] font-bold uppercase tracking-wide text-brand">
+                api
+              </span>
+            )}
           </div>
-          <p className="line-clamp-1 text-[11px] text-faint">{meta.job}</p>
+          <p className="line-clamp-1 font-mono text-[10px] text-faint">
+            {meta.exposure === "http" ? `POST /api/agent/${meta.endpoint}` : meta.job}
+          </p>
         </div>
         <span
           className={cn(

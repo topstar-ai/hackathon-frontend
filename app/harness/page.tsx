@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle, Input, Select, Button } from "@/components
 import { HarnessTable } from "@/components/HarnessTable";
 import { AggregatePanel } from "@/components/AggregatePanel";
 import { getHarness } from "@/lib/api";
-import { AGENTS } from "@/lib/agents";
+import { VISIBLE_AGENTS } from "@/lib/agents";
 import type { HarnessEntry, Severity } from "@/lib/types";
 
 export default function HarnessPage() {
@@ -107,7 +107,7 @@ export default function HarnessPage() {
           </div>
           <Select value={agent} onChange={(e) => setAgent(e.target.value)}>
             <option value="">All agents</option>
-            {AGENTS.map((a) => (
+            {VISIBLE_AGENTS.map((a) => (
               <option key={a.id} value={a.id}>
                 {a.number} {a.name}
               </option>

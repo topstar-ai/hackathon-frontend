@@ -3,11 +3,13 @@
 import { useEffect, useRef } from "react";
 import { Terminal } from "lucide-react";
 import { useRunStore } from "@/lib/store";
-import { AGENTS_BY_ID } from "@/lib/agents";
+import { AGENTS_BY_ID, isVisibleAgent } from "@/lib/agents";
 import { formatTime, cn } from "@/lib/utils";
 
 export function EventLog() {
-  const log = useRunStore((s) => s.log);
+  const allLog = useRunStore((s) => s.log);
+  // Only show events from visible (HTTP-exposed) agents.
+  const log = allLog.filter((l) => isVisibleAgent(l.agentId));
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

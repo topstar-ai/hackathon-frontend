@@ -10,6 +10,8 @@ import { AlignmentLoopModal } from "@/components/AlignmentLoopModal";
 import { VerdictSummary } from "@/components/VerdictSummary";
 import { useRunStore } from "@/lib/store";
 import { verdictTone } from "@/lib/verdict";
+import { isVisibleAgent } from "@/lib/agents";
+import type { AgentId } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 function StatusPill() {
@@ -29,11 +31,24 @@ function StatusPill() {
   );
 }
 
+function RunError() {
+  const status = useRunStore((s) => s.status);
+  const error = useRunStore((s) => s.error);
+  if (status !== "error" || !error) return null;
+  return (
+    <div className="mb-4 flex items-start gap-2 rounded-xl border border-fail/40 bg-fail/10 px-3.5 py-2.5 text-sm text-fail">
+      <span className="font-semibold">Run failed:</span>
+      <span className="font-mono text-xs text-fail/90">{error}</span>
+    </div>
+  );
+}
+
 function VerdictTally() {
   const nodes = useRunStore((s) => s.nodes);
   let pass = 0;
   let fail = 0;
-  Object.values(nodes).forEach((n) => {
+  (Object.entries(nodes) as [AgentId, (typeof nodes)[AgentId]][]).forEach(([id, n]) => {
+    if (!isVisibleAgent(id)) return;
     if (n.state !== "done" || !n.verdict) return;
     const t = verdictTone(n.verdict);
     if (t === "pass") pass++;
@@ -58,10 +73,12 @@ export default function RunPage() {
           <span className="text-fg">alignment pipeline</span>
         </h1>
         <p className="text-sm text-muted">
-          14 agents intercept every turn, profile both sides, and hold the engine&apos;s output
-          until it passes alignment, gap, and quality checks.
+          Specialist agents intercept every turn and hold the engine&apos;s output until it
+          passes alignment, gap, and the parallel quality checks.
         </p>
       </div>
+
+      <RunError />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[340px_minmax(0,1fr)_380px]">
         {/* Left: input + output */}

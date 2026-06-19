@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FileText, Loader2 } from "lucide-react";
+import { FileText, Loader2, Zap, Workflow } from "lucide-react";
 import { Card, Badge, Mono } from "@/components/ui";
 import { AGENT_ICON } from "@/components/agentIcons";
 import { getAgents } from "@/lib/api";
@@ -32,7 +32,8 @@ export default function AgentsPage() {
   const [agents, setAgents] = useState<AgentMeta[] | null>(null);
 
   useEffect(() => {
-    getAgents().then(setAgents);
+    // Only agents with a real HTTP endpoint are listed.
+    getAgents().then((rows) => setAgents(rows.filter((a) => a.exposure === "http")));
   }, []);
 
   return (
@@ -40,8 +41,8 @@ export default function AgentsPage() {
       <div>
         <h1 className="text-lg font-semibold text-fg">Agent directory</h1>
         <p className="text-sm text-muted">
-          13 specialist agents + 1 coordinator. Each does exactly one job and returns a
-          structured verdict.
+          The verdict-producing agents exposed over HTTP — each a Band remote agent
+          (LangGraph, Claude Sonnet 4.6) doing exactly one job at its own endpoint.
         </p>
       </div>
 
@@ -70,6 +71,39 @@ export default function AgentsPage() {
 
               <p className="text-xs text-muted">{a.job}</p>
 
+              {/* connection / endpoint */}
+              {a.exposure === "http" ? (
+                <div className="flex items-center gap-1.5 rounded-md border border-brand/30 bg-brand/10 px-2 py-1">
+                  <Zap className="h-3 w-3 shrink-0 text-brand" />
+                  <span className="truncate font-mono text-[10px] text-brand">
+                    POST /api/agent/{a.endpoint}
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5 rounded-md border border-white/10 bg-white/5 px-2 py-1">
+                  <Workflow className="h-3 w-3 shrink-0 text-faint" />
+                  <span className="truncate text-[10px] text-muted">coordinator-orchestrated</span>
+                </div>
+              )}
+
+              <div className="flex flex-wrap gap-1">
+                {a.model && (
+                  <span className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 font-mono text-[9px] text-faint">
+                    {a.model}
+                  </span>
+                )}
+                {a.runtime && (
+                  <span className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-[9px] text-faint">
+                    {a.runtime}
+                  </span>
+                )}
+                {a.parallelGroup && (
+                  <span className="rounded border border-brand/30 bg-brand/10 px-1.5 py-0.5 text-[9px] text-brand">
+                    parallel · {a.parallelGroup}
+                  </span>
+                )}
+              </div>
+
               <div className="mt-auto space-y-2 pt-1">
                 <div>
                   <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-faint">
@@ -82,11 +116,6 @@ export default function AgentsPage() {
                     <FileText className="h-3 w-3" />
                     <span className="font-mono">{a.rulesFile}</span>
                   </div>
-                )}
-                {a.parallelGroup && (
-                  <Badge className="border-brand/30 bg-brand/10 text-brand">
-                    parallel · {a.parallelGroup}
-                  </Badge>
                 )}
               </div>
             </Card>

@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { ShieldAlert, ShieldCheck, ShieldQuestion, Loader2 } from "lucide-react";
 import { useRunStore } from "@/lib/store";
 import { verdictTone } from "@/lib/verdict";
+import { isVisibleAgent } from "@/lib/agents";
+import type { AgentId } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 // Headline verdict banner — mirrors the reference "Drift confirmed" callout.
@@ -13,7 +15,8 @@ export function VerdictSummary() {
   const iteration = useRunStore((s) => s.iteration);
 
   let fails = 0;
-  Object.values(nodes).forEach((n) => {
+  (Object.entries(nodes) as [AgentId, (typeof nodes)[AgentId]][]).forEach(([id, n]) => {
+    if (!isVisibleAgent(id)) return;
     if (n.state === "done" && n.verdict && verdictTone(n.verdict) === "fail") fails++;
   });
 

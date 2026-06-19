@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CornerLeftUp, RotateCw } from "lucide-react";
+import { RotateCw, CornerDownRight } from "lucide-react";
 import { AGENTS_BY_ID } from "@/lib/agents";
 import type { AgentId } from "@/lib/types";
 import { useRunStore } from "@/lib/store";
@@ -67,25 +67,14 @@ export function PipelineGraph() {
 
   return (
     <div className="mx-auto w-full max-w-md">
-      {/* Coordinator banner */}
-      {renderNode("coordinator")}
-      <Connector active={active} />
+      {/* Only the HTTP-exposed agents are shown. Loggers, profilers, the
+          question generator and coordinator run behind the scenes. */}
 
-      {renderNode("human-logger")}
-      <Connector active={active} />
-
-      {renderNode("thinking-logger")}
-      <Connector active={active} />
-
-      <Lane label="Profilers">
-        {renderNode("human-profiler")}
-        {renderNode("engine-profiler")}
-      </Lane>
-      <Connector active={active} />
-
+      {/* 05 Alignment Classifier */}
       {renderNode("alignment-checker")}
 
-      {/* Alignment loop branch */}
+      {/* Misalignment loop — driven by 05; the human is asked to clarify and
+          the turn is re-run. (Question generation is coordinator-side.) */}
       <div className="relative my-2">
         <div
           className={cn(
@@ -95,7 +84,7 @@ export function PipelineGraph() {
               : "border-dashed border-border-strong/60 bg-panel/30",
           )}
         >
-          <div className="mb-2 flex items-center justify-between px-1">
+          <div className="flex items-center justify-between px-1">
             <span className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-warn">
               <RotateCw className={cn("h-3 w-3", looping && active && "animate-spin")} />
               misalignment loop
@@ -104,22 +93,23 @@ export function PipelineGraph() {
               iteration {iteration}
             </span>
           </div>
-          {renderNode("question-generator")}
           <motion.div
-            className="mt-2 flex items-center gap-1.5 pl-1 text-[10px] text-faint"
+            className="mt-1.5 flex items-center gap-1.5 pl-1 text-[10px] text-faint"
             animate={looping ? { opacity: [0.4, 1, 0.4] } : { opacity: 0.6 }}
             transition={{ duration: 1.4, repeat: looping ? Infinity : 0 }}
           >
-            <CornerLeftUp className="h-3.5 w-3.5 text-warn" />
-            loops back to <span className="font-mono text-warn">03 Human Profiler</span> with the answer
+            <CornerDownRight className="h-3.5 w-3.5 text-warn" />
+            on misaligned · ask the human · re-run <span className="font-mono text-warn">05</span>
           </motion.div>
         </div>
       </div>
 
       <Connector active={active} />
+      {/* 07 Gap Analyzer */}
       {renderNode("gap-analyzer")}
       <Connector active={active} />
 
+      {/* 08–12 checkers in parallel */}
       <Lane label="Checkers">
         {renderNode("constraints")}
         {renderNode("antipatterns")}
@@ -129,6 +119,7 @@ export function PipelineGraph() {
       </Lane>
       <Connector active={active} />
 
+      {/* 13 Verifier */}
       {renderNode("harness-logger")}
     </div>
   );

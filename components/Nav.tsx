@@ -3,8 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Activity, Database, Grid3x3, Shield, Menu, X } from "lucide-react";
+import { Activity, Database, Grid3x3, Shield, Menu, X, Radio, FlaskConical } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { CONNECTION_MODE, PUBLIC_AGENT_API_BASE } from "@/lib/config";
 
 const LINKS = [
   { href: "/", label: "Run", icon: Activity },
@@ -63,10 +64,25 @@ export function Nav() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
-          <span className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-muted">
-            <span className="h-1.5 w-1.5 rounded-full bg-pass animate-dot" />
-            14 agents · mock backend
-          </span>
+          {CONNECTION_MODE === "live" ? (
+            <span
+              className="flex items-center gap-1.5 rounded-full border border-pass/40 bg-pass/10 px-2.5 py-1 text-[11px] text-pass"
+              title={`Live agent gateway · ${PUBLIC_AGENT_API_BASE}`}
+            >
+              <Radio className="h-3 w-3" />
+              <span className="font-semibold">LIVE</span>
+              <span className="hidden text-pass/70 sm:inline">8 agent endpoints</span>
+            </span>
+          ) : (
+            <span
+              className="flex items-center gap-1.5 rounded-full border border-warn/40 bg-warn/10 px-2.5 py-1 text-[11px] text-warn"
+              title="No gateway configured — simulated pipeline. Set NEXT_PUBLIC_AGENT_API_BASE to go live."
+            >
+              <FlaskConical className="h-3 w-3" />
+              <span className="font-semibold">MOCK</span>
+              <span className="hidden text-warn/70 sm:inline">simulated</span>
+            </span>
+          )}
         </div>
       </div>
 
